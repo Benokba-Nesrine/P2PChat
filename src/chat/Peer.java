@@ -17,6 +17,9 @@ public class Peer {
     public Peer(Socket socket) {
         this.socket = socket;
     }
+        public Socket getSocket() {
+        return socket;       
+    }
     public Socket getSocket getSocket() {
         return socket;
     }
