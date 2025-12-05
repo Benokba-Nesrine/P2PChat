@@ -1,5 +1,4 @@
-
-package P2P.chat;
+package chat;
 
 import java.io.*;
 import java.net.Socket;
@@ -7,7 +6,7 @@ import java.util.*;
 
 public class MessageReceiver implements Runnable {
     private final Socket socket;
-    private String peerName = "stranger";  
+    private String peerName = "stranger";
     private final Callback callback;
 
     public interface Callback {
@@ -24,43 +23,40 @@ public class MessageReceiver implements Runnable {
     public void run() {
         try (DataInputStream in = new DataInputStream(socket.getInputStream())) {
             while (!socket.isClosed()) {
-                int len = in.readInt();  
-                if (len <= 0 || len > 1_000_000) break; 
+                int len = in.readInt();
+                if (len <= 0 || len > 1_000_000) break;
 
                 byte[] buf = new byte[len];
-                in.readFully(buf); 
+                in.readFully(buf);
 
                 String json = new String(buf, java.nio.charset.StandardCharsets.UTF_8);
-                Map<String, String> msg = parse(json);  
+                Map<String, String> msg = parse(json);
 
-               
                 if ("hello".equals(msg.get("type"))) {
                     peerName = msg.get("name");
-                    System.out.println("[i] " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort() + " is now → " + peerName);
+                    System.out.println("[i] " + socket.getInetAddress().getHostAddress() + ":" + socket.getPort() + " → " + peerName);
                     continue;
                 }
 
-                
                 String name = msg.getOrDefault("name", peerName);
                 String text = msg.get("text");
                 String time = msg.getOrDefault("time", new Date().toString().substring(11, 19));
 
-                callback.onMessage(name, text, time); 
+                callback.onMessage(name, text, time);
             }
         } catch (Exception ignored) {
-            
         } finally {
             try { socket.close(); } catch (Exception ignored) {}
             callback.onDisconnect(socket.getInetAddress().getHostAddress(), socket.getPort());
         }
     }
 
-   
+    // Super simple and 100% safe JSON parser (no external lib)
     private Map<String, String> parse(String json) {
         Map<String, String> map = new HashMap<>();
-        json = json.replace("{", "").replace("}", "").replace("\"", "");
-        for (String pair : json.split(",")) {
-            String[] kv = pair.split(":", 2);
+        json = json.replaceAll("[{}\"]", "");           // remove { } and quotes
+        for (String part : json.split(",")) {
+            String[] kv = part.split(":", 2);
             if (kv.length == 2) {
                 map.put(kv[0].trim(), kv[1].trim());
             }
