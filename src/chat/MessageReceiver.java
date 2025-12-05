@@ -2,9 +2,11 @@ package chat;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class MessageReceiver implements Runnable {
+
     private final Socket socket;
     private String peerName = "stranger";
     private final Callback callback;
@@ -29,7 +31,7 @@ public class MessageReceiver implements Runnable {
                 byte[] buf = new byte[len];
                 in.readFully(buf);
 
-                String json = new String(buf, java.nio.charset.StandardCharsets.UTF_8);
+                String json = new String(buf, StandardCharsets.UTF_8);
                 Map<String, String> msg = parse(json);
 
                 if ("hello".equals(msg.get("type"))) {
@@ -42,19 +44,29 @@ public class MessageReceiver implements Runnable {
                 String text = msg.get("text");
                 String time = msg.getOrDefault("time", new Date().toString().substring(11, 19));
 
-                callback.onMessage(name, text, time);
+                // DISPLAY MESSAGE
+                System.out.println("[" + time + "] " + name + ": " + text);
+
+                // SAVE TO HISTORY (Person 5 job – now done)
+                ChatHistory.addMessage(name, text);
+
+                if (callback != null) {
+                    callback.onMessage(name, text, time);
+                }
             }
         } catch (Exception ignored) {
+            // connection lost
         } finally {
             try { socket.close(); } catch (Exception ignored) {}
-            callback.onDisconnect(socket.getInetAddress().getHostAddress(), socket.getPort());
+            if (callback != null) {
+                callback.onDisconnect(socket.getInetAddress().getHostAddress(), socket.getPort());
+            }
         }
     }
 
-    // Super simple and 100% safe JSON parser (no external lib)
     private Map<String, String> parse(String json) {
         Map<String, String> map = new HashMap<>();
-        json = json.replaceAll("[{}\"]", "");           // remove { } and quotes
+        json = json.replaceAll("[{}\"]", "");
         for (String part : json.split(",")) {
             String[] kv = part.split(":", 2);
             if (kv.length == 2) {
