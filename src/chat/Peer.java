@@ -17,7 +17,9 @@ public class Peer {
     public Peer(Socket socket) {
         this.socket = socket;
     }
-
+    public Socket getSocket getSocket() {
+        return socket;
+    }
     // Returns the InputStream of the socket.
     // This is used to READ data that the other peer sends to us.
     public InputStream in() throws IOException {
