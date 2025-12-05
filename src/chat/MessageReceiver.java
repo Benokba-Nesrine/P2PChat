@@ -44,10 +44,10 @@ public class MessageReceiver implements Runnable {
                 String text = msg.get("text");
                 String time = msg.getOrDefault("time", new Date().toString().substring(11, 19));
 
-                // DISPLAY MESSAGE
+          
                 System.out.println("[" + time + "] " + name + ": " + text);
 
-                // SAVE TO HISTORY (Person 5 job – now done)
+           
                 ChatHistory.addMessage(name, text);
 
                 if (callback != null) {
@@ -55,7 +55,7 @@ public class MessageReceiver implements Runnable {
                 }
             }
         } catch (Exception ignored) {
-            // connection lost
+       
         } finally {
             try { socket.close(); } catch (Exception ignored) {}
             if (callback != null) {
