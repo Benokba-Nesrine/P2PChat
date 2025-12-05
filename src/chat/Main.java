@@ -1,11 +1,12 @@
 package chat;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Main implements PeerListener {
 
-    public static String myName = "You";           // will be asked at startup
-
+    public static String myName = "You";           // will be set after input
     private final ConnectionManager connectionManager;
     private final Scanner scanner = new Scanner(System.in);
 
@@ -42,6 +43,20 @@ public class Main implements PeerListener {
                 System.out.println("Goodbye!");
                 break;
             }
+            else if (!input.isEmpty()) {
+                // SEND MESSAGE TO ALL CONNECTED PEERS
+                String time = new SimpleDateFormat("HH:mm").format(new Date());
+                String json = "{\"name\":\"" + myName + "\",\"text\":\"" + input + "\",\"time\":\"" + time + "\"}";
+                byte[] data = json.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+                for (Peer p : app.connectionManager.getPeers()) {
+                    try {
+                        DataOutputStream out = new DataOutputStream(p.out());
+                        out.writeInt(data.length);
+                        out.write(data);
+                    } catch (Exception ignored) {}
+                }
+            }
         }
     }
 
@@ -57,7 +72,7 @@ public class Main implements PeerListener {
 
             @Override
             public void onDisconnect(String ip, int port) {
-                System.out.println("Peer disconnected: " + ip + port);
+                System.out.println("Peer disconnected: " + ip + ":" + port);
             }
         })).start();
     }
