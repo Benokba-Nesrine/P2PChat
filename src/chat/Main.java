@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 public class Main implements PeerListener {
 
-    public static String myName = "You";           // will be set after input
+    public static String myName = "You";          
     private final ConnectionManager connectionManager;
     private final Scanner scanner = new Scanner(System.in);
 
