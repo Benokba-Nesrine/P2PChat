@@ -7,7 +7,7 @@ import java.net.Socket;               // For each connection to another peer
 import java.util.ArrayList;
 import java.util.Collections;         // To make list thread-safe
 import java.util.List;
-
+import P2P.chat.MessageReceiver;
 public class ConnectionManager {
 
     // The server socket that listens for incoming connections
