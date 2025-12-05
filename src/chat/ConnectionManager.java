@@ -5,7 +5,7 @@ import java.io.IOException;            // For input/output errors
 import java.net.ServerSocket;         // For the server that listens for connections
 import java.net.Socket;               // For each connection to another peer
 import java.util.ArrayList;
-import java.util.Collections;         // To make list thread-safe
+import java.util.Collections;         // To make list thread-safe 
 import java.util.List;
 import P2P.chat.MessageReceiver;
 public class ConnectionManager {
@@ -55,7 +55,8 @@ public class ConnectionManager {
 
                     // Accept a new connection -> returns a Socket
                     Socket socket = serverSocket.accept();
-
+                    sendHandshake(socket);
+                    startMessageReceiver(socket);
                     // Wrap it in a Peer object
                     Peer peer = new Peer(socket);
 
@@ -86,7 +87,8 @@ public class ConnectionManager {
 
         // Open a socket to the host
         Socket socket = new Socket(host, port);
-
+        sendHandshake(socket);
+        startMessageReceiver(socket);
         // Wrap it in a Peer object
         Peer peer = new Peer(socket);
 
@@ -128,5 +130,28 @@ public class ConnectionManager {
         }
 
         System.out.println("[ConnectionManager] Shutdown complete.");
+    }
+        private void sendHandshake(Socket socket) {
+        try {
+            String hello = "{\"type\":\"hello\",\"name\":\"" + Main.myName + "\"}";
+            byte[] data = hello.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            out.writeInt(data.length);
+            out.write(data);
+        } catch (Exception ignored) {}
+    }
+
+    private void startMessageReceiver(Socket socket) {
+        new Thread(new MessageReceiver(socket, new MessageReceiver.Callback() {
+            @Override
+            public void onMessage(String name, String text, String time) {
+                System.out.println("[" + time + "] " + name + ": " + text);
+            }
+
+            @Override
+            public void onDisconnect(String ip, int port) {
+                System.out.println("Disconnected: " + ip + ":" + port);
+            }
+        })).start();
     }
 }
