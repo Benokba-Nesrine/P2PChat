@@ -17,7 +17,7 @@ public class ConnectionManager {
     private final List<Peer> peers = Collections.synchronizedList(new ArrayList<>());
     private final PeerListener listener;
     public ConnectionManager(PeerListener listener) {
-        this.listener = listener;   // Save the callback
+        this.listener = listener;   
     }
 
     public void startServer(int port) throws IOException {
@@ -48,7 +48,7 @@ public class ConnectionManager {
 
                 } catch (IOException e) {
                     if (running)
-                        e.printStackTrace();  // Print error details
+                        e.printStackTrace();  
                 }
             }
         });
