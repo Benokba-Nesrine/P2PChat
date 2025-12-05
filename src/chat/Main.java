@@ -1,19 +1,53 @@
 package chat;
-import P2P.chat.MessageReceiver;
-public class Main implements PeerListener { 
-    public static void main(String[] args) throws Exception {
 
-       Main mainInstance = new Main();
-        ConnectionManager cm = new ConnectionManager(mainInstance);
-   
+import java.util.Scanner;
 
-        // Start server on port 5000
-        cm.startServer(2005);
+public class Main implements PeerListener {
 
+    public static String myName = "You";           // will be asked at startup
+
+    private final ConnectionManager connectionManager;
+    private final Scanner scanner = new Scanner(System.in);
+
+    public Main() {
+        this.connectionManager = new ConnectionManager(this);
     }
-        @Override
+
+    public static void main(String[] args) throws Exception {
+        System.out.print("Enter your name: ");
+        myName = new Scanner(System.in).nextLine().trim();
+        if (myName.isEmpty()) myName = "User";
+
+        Main app = new Main();
+
+        app.connectionManager.startServer(2005);
+
+        System.out.println("\nP2P Chat started – you are: " + myName);
+        System.out.println("Waiting for peers... (type 'connect <ip>' or 'exit')");
+
+        while (true) {
+            String input = app.scanner.nextLine().trim();
+
+            if (input.startsWith("connect ")) {
+                String ip = input.substring(8).trim();
+                try {
+                    app.connectionManager.connectToPeer(ip, 2005);
+                    System.out.println("Connecting to " + ip + "...");
+                } catch (Exception e) {
+                    System.out.println("Connection failed");
+                }
+            }
+            else if (input.equalsIgnoreCase("exit")) {
+                app.connectionManager.shutdown();
+                System.out.println("Goodbye!");
+                break;
+            }
+        }
+    }
+
+    @Override
     public void onPeerConnected(Peer peer) {
-        System.out.println("New peer connected: " + peer.getIp() + ":" + peer.getPort());
+        System.out.println("Peer connected: " + peer.getIp() + ":" + peer.getPort());
 
         new Thread(new MessageReceiver(peer.getSocket(), new MessageReceiver.Callback() {
             @Override
@@ -23,7 +57,7 @@ public class Main implements PeerListener {
 
             @Override
             public void onDisconnect(String ip, int port) {
-                System.out.println("Disconnected: " + ip + ":" + port);
+                System.out.println("Peer disconnected: " + ip + port);
             }
         })).start();
     }
