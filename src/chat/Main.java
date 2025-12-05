@@ -24,6 +24,7 @@ public class Main implements PeerListener {
         app.connectionManager.startServer(2005);
 
         System.out.println("\nP2P Chat started – you are: " + myName);
+ChatHistory.showHistory();
         System.out.println("Waiting for peers... (type 'connect <ip>' or 'exit')");
 
         while (true) {
