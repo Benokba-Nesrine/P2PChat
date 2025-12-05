@@ -6,7 +6,7 @@ import java.io.IOException;      // Needed for input/output errors
 import java.io.InputStream;      // Needed to read data from the peer
 import java.io.OutputStream;     // Needed to send data to the peer
 import java.net.Socket;          // Represents a network connection to another machine
-
+import P2P.chat.MessageReceiver;
 public class Peer {
     // This is the socket connection to the other peer.
     // final = we cannot replace the socket with another one once it's created.
