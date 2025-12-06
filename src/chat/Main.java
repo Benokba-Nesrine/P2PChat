@@ -22,7 +22,7 @@ public class Main implements PeerListener {
 
         Main app = new Main();
 
-        app.connectionManager.startServer(2006);
+        app.connectionManager.startServer(2000);
 
         System.out.println("\nP2P Chat started – you are: " + myName);
         ChatHistory.showHistory();
@@ -34,7 +34,7 @@ public class Main implements PeerListener {
             if (input.startsWith("connect ")) {
                 String ip = input.substring(8).trim();
                 try {
-                    app.connectionManager.connectToPeer(ip, 2006);
+                    app.connectionManager.connectToPeer(ip, 2000);
                     System.out.println("Connecting to " + ip + "...");
                 } catch (Exception e) {
                     System.out.println("Connection failed");

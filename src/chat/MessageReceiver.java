@@ -54,8 +54,9 @@ public class MessageReceiver implements Runnable {
                     callback.onMessage(name, text, time);
                 }
             }
-        } catch (Exception ignored) {
-       
+        } catch (Exception e) {
+        	e.printStackTrace();
+        	
         } finally {
             try { socket.close(); } catch (Exception ignored) {}
             if (callback != null) {
