@@ -1,5 +1,6 @@
 package chat;
 
+import java.io.DataOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
@@ -21,10 +22,10 @@ public class Main implements PeerListener {
 
         Main app = new Main();
 
-        app.connectionManager.startServer(2005);
+        app.connectionManager.startServer(2006);
 
         System.out.println("\nP2P Chat started – you are: " + myName);
-ChatHistory.showHistory();
+        ChatHistory.showHistory();
         System.out.println("Waiting for peers... (type 'connect <ip>' or 'exit')");
 
         while (true) {
@@ -33,7 +34,7 @@ ChatHistory.showHistory();
             if (input.startsWith("connect ")) {
                 String ip = input.substring(8).trim();
                 try {
-                    app.connectionManager.connectToPeer(ip, 2005);
+                    app.connectionManager.connectToPeer(ip, 2006);
                     System.out.println("Connecting to " + ip + "...");
                 } catch (Exception e) {
                     System.out.println("Connection failed");
